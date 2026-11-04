@@ -9,14 +9,14 @@ Academic data analytics project using the IBM Telco Customer Churn sample to inv
 - 7,043 customer records, 21 columns.
 
 ## Phase 1 contents
-- `phase1_notebook.ipynb`: Project proposal, planned work, raw CSV loading and initial inspection.
+- `telecom-churn-clv-analysis_phase1.ipynb`: Project proposal, planned work, raw CSV loading and initial inspection.
 - `data/WA_Fn-UseC_-Telco-Customer-Churn.csv`: Approved dataset, unchanged.
 - `SRS.pdf`: Software Requirements Specification supplied with the project.
 
 ## How to run
 1. Install Python 3, Jupyter Notebook and Pandas (`pip install notebook pandas`).
 2. Open a terminal in this repository's root folder.
-3. Run `jupyter notebook` and open `phase1_notebook.ipynb`.
+3. Run `jupyter notebook` and open `telecom-churn-clv-analysis_phase1.ipynb`.
 4. Choose **Restart & Run All**. The notebook reads the CSV using a relative path from the repository root.
 
 ## Tools planned for future phases
