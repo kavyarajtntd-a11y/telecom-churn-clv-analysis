@@ -45,7 +45,6 @@ The combined Phase 1 and Phase 2 notebook performs the following steps:
 telecom-churn-clv-analysis/
 ├── README.md
 ├── Telecom_Churn_CLV_Phase1_SRS.docx
-├── Telecom_Churn_CLV_Phase1_Phase2_SRS.docx
 ├── telecom-churn-clv-analysis_phase1.ipynb
 ├── telecom-churn-clv-analysis_phase1_phase2.ipynb
 └── data/
