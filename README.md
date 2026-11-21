@@ -1,90 +1,78 @@
 # Telecom Churn Prediction & Customer Lifetime Value (CLV) Analysis
 
-## Project overview
+## Final Project | Single Jupyter Notebook
 
-This academic data analytics project uses the IBM Telco Customer Churn sample to investigate churn and prepare for a revenue-based customer lifetime value (CLV) estimate. Phase 1 established the research proposal and inspected the dataset. Phase 2 focuses on data quality, cleaning, categorical encoding and a feature-scaling demonstration. Churn modelling, CLV estimation, SQL modelling and Power BI reporting are planned for later stages.
+This academic project explores recorded churn in the IBM Telco Customer Churn sample, prepares data for analysis, constructs a MySQL star schema, models recorded churn status, estimates a transparent revenue-based customer value scenario, and presents findings in charts and an interactive HTML dashboard preview.
 
-## Business problem and objectives
+**Original source:** https://www.kaggle.com/datasets/blastchar/telco-customer-churn  
+**Data:** 7,043 customer records and 21 columns, in `data/WA_Fn-UseC_-Telco-Customer-Churn.csv`.  
+**Main notebook:** `telecom-churn-clv-analysis.ipynb` (contains all phases in one file).
 
-Telecommunications providers need to understand customer churn and the recurring revenue associated with different subscriber groups. The planned analysis will compare churn across contract types, internet services and customer tenure; examine billing and support-service patterns; calculate revenue metrics; and evaluate churn classification models in later phases. Observed patterns do not establish causal explanations.
+## What is included
 
-## Approved dataset
+| Phase | Contents |
+|---|---|
+| 1 | Problem statement, objectives, dataset approval information, initial inspection |
+| 2 | Raw-data preservation, missing values, duplicate checks, `TotalCharges` repair, categorical encoding and scaling demonstration |
+| 3 | Three dimension tables, subscription fact table, CSV warehouse exports, MySQL DDL, SQL reporting queries and optional importer |
+| 4 | Churn by contract, internet service and payment method; tenure and billing comparisons; ARPU proxy; 12/24/36-month revenue value scenarios |
+| 5 | Majority baseline, Logistic Regression and Random Forest classification, held-out metrics and model export |
+| 6 | Executive metrics, charts, Plotly interactive dashboard preview and Power BI build instructions |
 
-- **Dataset:** Telco Customer Churn (IBM sample distributed via Kaggle)
-- **Source:** https://www.kaggle.com/datasets/blastchar/telco-customer-churn
-- **Original file:** `data/WA_Fn-UseC_-Telco-Customer-Churn.csv`
-- **Format:** CSV; **7,043 rows and 21 columns**; one record per customer
-- **Important fields:** `customerID`, `tenure`, `Contract`, `InternetService`, `PaymentMethod`, `MonthlyCharges`, `TotalCharges`, `Churn`
+## Run the complete notebook
 
-## Phase 1: Accepted
+1. Extract or clone the repository, preserving the `data/` folder.
+2. Install Python 3.10+ and dependencies: `pip install -r requirements.txt`.
+3. From the repository root, launch `jupyter notebook` and open `telecom-churn-clv-analysis.ipynb`.
+4. Select **Restart & Run All**. The notebook regenerates the processed data, warehouse extracts, charts, model and report CSVs.
+5. Open `dashboard/telecom_analytics_preview.html` in a browser for an interactive dashboard preview. This file is **not a Power BI .pbix**.
 
-The Phase 1 notebook records the project domain, overview, business problem, objectives, business value, dataset information, planned analysis and limitations. It reads the original CSV with Pandas and displays `head()`, `shape`, `info()` and data types. Initial inspection identified 11 whitespace-only entries in `TotalCharges`.
+## MySQL Workbench setup (manual, requires local MySQL server)
 
-## Phase 2: Data cleaning and preprocessing
+1. Run `sql/01_create_star_schema.sql` in MySQL Workbench (MySQL 8+).
+2. Install `mysql-connector-python` (included in requirements.txt).
+3. Set `MYSQL_PASSWORD` in your environment and optionally `MYSQL_USER`, `MYSQL_HOST`, `MYSQL_PORT`. Never commit secrets.
+4. Run `python scripts/load_mysql.py` from the repository root.
+5. Run `sql/02_reporting_queries.sql`; compare row counts and totals with notebook output.
 
-The combined Phase 1 and Phase 2 notebook performs the following steps:
+**Execution disclosure:** The Python notebook was executed successfully and generated its files. MySQL creation and import were **not tested against a live MySQL server** in this package.
 
-1. Make a working copy while keeping the original dataset unchanged.
-2. Inspect missing values, blank strings, duplicate rows and duplicate `customerID` values.
-3. Strip leading/trailing whitespace from text fields.
-4. Convert `TotalCharges` to a numeric data type using `pd.to_numeric(errors="coerce")`.
-5. Set missing `TotalCharges` values to zero **only for records with `tenure == 0`**, then validate the result.
-6. Review numerical ranges and categorical values without automatically dropping observations.
-7. Map Yes/No variables to 0/1, encode gender consistently with the source sample, and one-hot encode remaining multi-category variables.
-8. Demonstrate `StandardScaler` for `tenure` and `MonthlyCharges` in a separate preview. The exported encoded CSV remains **unscaled**. Any future predictive pipeline must fit preprocessing on training data only.
-9. Validate the datasets and export cleaned and encoded CSV files for later work.
+## Power BI Desktop setup (manual)
 
-### Phase 2 outputs
+1. Import `data/warehouse/dim_customer.csv`, `dim_services.csv`, `dim_contract.csv`, `fact_subscriptions.csv`.
+2. Define single-direction many-to-one relationships from fact keys to matching dimension keys.
+3. Add DAX measures from `dashboard/POWER_BI_GUIDE.md`.
+4. Build KPI cards, churn rates by contract/service, revenue views and slicers. Save a `.pbix` locally if the instructor requires one.
 
-- `data/processed/telco_cleaned.csv`: The cleaned 7,043-row customer-level dataset. Original category labels are retained for exploratory analysis and reporting.
-- `data/processed/telco_encoded.csv`: Numerical categorical encodings for later modelling preparation, without `customerID`. This file is not a finished train/test modelling pipeline.
+**Execution disclosure:** A functional Plotly HTML dashboard is supplied. A native Power BI `.pbix` is **not included** and requires Power BI Desktop.
 
-## Repository structure
+## Snapshot findings
 
-```text
-telecom-churn-clv-analysis/
-├── README.md
-├── Telecom_Churn_CLV_Phase1_SRS.docx
-├── telecom-churn-clv-analysis_phase1.ipynb
-├── telecom-churn-clv-analysis_phase1_phase2.ipynb
-└── data/
-    ├── WA_Fn-UseC_-Telco-Customer-Churn.csv
-    └── processed/
-        ├── telco_cleaned.csv
-        └── telco_encoded.csv
-```
+- 7,043 recorded customers, 1,869 marked churned, historical recorded churn share **26.54%**.
+- Recorded churn shares: month-to-month **42.71%**, one-year **11.27%**, two-year **2.83%**. These are associations, not evidence that contract changes cause retention.
+- 5,174 customers are marked retained. Mean listed monthly charges in this group: **$61.27** (a **snapshot ARPU proxy**, not audited realised monthly revenue).
+- On a stratified 20% hold-out split, Logistic Regression achieved F1 **0.591**, ROC-AUC **0.839**; Random Forest F1 **0.558**, ROC-AUC **0.834**. These are retrospective cross-sectional classification metrics, not a validated future churn forecast.
 
-The names above match the recommended upload names. If your GitHub filenames differ, update this section to reflect the files actually present.
+## Methodological limitations
 
-## How to run
+- The data lacks churn event dates, real customer future lifetimes, marketing intervention results, acquisition costs and profit margins.
+- The value calculation is an illustrative 12/24/36-month **revenue scenario**, `MonthlyCharges × assumed horizon`, not observed or profit-based CLV. Churn snapshot share is not a monthly hazard rate.
+- `Churn` describes recorded status, not a verified next-month event.
+- Train/test split precedes learned preprocessing. The encoded CSV is an exploratory artifact, not a replacement for training-only preprocessing.
+- No recommendations establish causal effects or guarantee improved retention.
 
-1. Download or clone this repository.
-2. Install Python 3 and the required libraries:
+## Deliverables
 
-   ```bash
-   pip install notebook pandas numpy scikit-learn
-   ```
+- `telecom-churn-clv-analysis.ipynb`: single combined notebook with execution outputs.
+- `Telecom_Churn_CLV_SRS.docx`: project requirements, including phases 3–6 addendum.
+- `data/`: raw, cleaned, encoded, revenue proxy and star-schema exports.
+- `sql/`: MySQL table definitions and reporting queries.
+- `scripts/load_mysql.py`: optional MySQL import utility.
+- `reports/`: computed KPIs, model comparisons, segment tables, charts, and a final summary.
+- `models/churn_classifier.joblib`: fitted academic classification pipeline; load only from trusted sources.
+- `dashboard/telecom_analytics_preview.html`: interactive Plotly preview.
+- `dashboard/POWER_BI_GUIDE.md`: suggested Power BI relationships, DAX measures and visuals.
 
-3. From the **repository root**, start Jupyter Notebook:
+## Submission status
 
-   ```bash
-   jupyter notebook
-   ```
-
-4. Open `telecom-churn-clv-analysis_phase1_phase2.ipynb` and choose **Restart & Run All**.
-5. Confirm the notebook reads `data/WA_Fn-UseC_-Telco-Customer-Churn.csv`, validates the cleaned dataset and creates the two files in `data/processed/`.
-
-## Validation and limitations
-
-- Expected source shape: **(7043, 21)**.
-- Expected hidden blank entries in `TotalCharges`: **11** before cleaning.
-- In the approved sample, the 11 blank charge records correspond to zero-tenure customers and are assigned zero charges. The raw CSV is preserved.
-- The dataset is a sample snapshot, without acquisition cost, profit margins or observed future subscriber lifetimes. Any eventual CLV will therefore be an **assumption-based revenue proxy**, not realised profit.
-- The `Churn` label indicates recorded churn status, not verified next-month cancellation.
-- Feature scaling demonstrated on the full data is **illustrative only**, not for evaluating models. Later modelling must use training-only fitted preprocessing and a separate test set.
-
-## Project status
-
-- **Phase 1:** Accepted.
-- **Phase 2:** Notebook prepared and executed locally; documentation and processed datasets prepared for GitHub submission. Instructor acceptance pending.
-- **Later phases:** Exploratory analysis, CLV proxy, churn classification, MySQL and Power BI.
+Python analytics: **executed and validated**. MySQL live execution: **pending on user's machine**. Native Power BI `.pbix`: **pending manual build**. Both items are described here rather than represented as complete.
